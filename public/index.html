@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Viewer (Refresh to Update)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        h1 { color: #333; }
+        pre { background-color: #eee; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        #webhookContent { max-height: 500px; overflow-y: scroll; border: 1px solid #ddd; padding: 10px; margin-top: 15px; }
+        .webhook-entry { margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px dashed #ccc; }
+        .webhook-entry:last-child { border-bottom: none; }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Nội dung Webhook đã nhận</h1>
+        <button onclick="fetchWebhooks()">Tải lại dữ liệu webhook</button>
+        <div id="webhookContent">
+            <p>Đang tải dữ liệu webhook...</p>
+        </div>
+    </div>
+
+    <script>
+        async function fetchWebhooks() {
+            const webhookContentDiv = document.getElementById('webhookContent');
+            webhookContentDiv.innerHTML = '<p>Đang tải dữ liệu webhook...</p>'; // Hiển thị trạng thái tải
+
+            try {
+                const response = await fetch('/api/webhooks');
+                const data = await response.json();
+
+                webhookContentDiv.innerHTML = ''; // Xóa nội dung cũ
+
+                if (data.length === 0) {
+                    webhookContentDiv.innerHTML = '<p>Chưa có dữ liệu webhook nào được nhận.</p>';
+                    return;
+                }
+
+                data.forEach(entry => {
+                    const entryDiv = document.createElement('div');
+                    entryDiv.classList.add('webhook-entry');
+
+                    const timestamp = new Date(entry.timestamp).toLocaleString();
+                    const timeSpan = document.createElement('span');
+                    timeSpan.innerHTML = `<strong>Thời gian:</strong> ${timestamp}<br>`;
+                    entryDiv.appendChild(timeSpan);
+
+                    const pre = document.createElement('pre');
+                    pre.textContent = JSON.stringify(entry.data, null, 2);
+                    entryDiv.appendChild(pre);
+
+                    webhookContentDiv.appendChild(entryDiv);
+                });
+            } catch (error) {
+                console.error('Lỗi khi tải dữ liệu webhook:', error);
+                webhookContentDiv.innerHTML = '<p style="color: red;">Không thể tải dữ liệu webhook. Vui lòng thử lại.</p>';
+            }
+        }
+
+        // Tải dữ liệu khi trang được tải lần đầu
+        document.addEventListener('DOMContentLoaded', fetchWebhooks);
+    </script>
+</body>
+</html>

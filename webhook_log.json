@@ -1,0 +1,20 @@
+[
+  {
+    "timestamp": "2025-06-08T15:39:08.675Z",
+    "data": {
+      "event": "test",
+      "data": {
+        "message": "Hello from webhook 2!"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-06-08T15:38:58.070Z",
+    "data": {
+      "event": "test",
+      "data": {
+        "message": "Hello from webhook!"
+      }
+    }
+  }
+]
